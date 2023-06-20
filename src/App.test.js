@@ -3,10 +3,14 @@ import App from './App';
 import Home from './pages/Home';
 import { fetchAllData, convertToArrayAndSortByTitle, getRecommendations } from './api';
 
+// =====================================================
+// TEST 1: Test to see if the App component renders
+// TEST 2: Test to see if the Home component renders
+// =====================================================
+
 test('Renders the App component', async () => {
   render(<App />);
-  
-  // Test to see if the App component renders
+  // TEST 1:
   await act(async () => {
       const appElement = screen.getByTestId('app');
       expect(appElement).toBeInTheDocument();
@@ -15,15 +19,20 @@ test('Renders the App component', async () => {
 
 test('Renders the Home component', () => {
   render(<Home />);
-
+  // TEST 2:
   const renderedText = screen.getByText('Thanks for the opportunity!');
 
   // Assertion: 1 - Existence of text means page loaded and rendered.
   expect(renderedText).toBeInTheDocument();
 });
 
+// =====================================================
+// TEST 3: Mock the database call and test that it returns the expected data array
+// TEST 4: Movie data array is sorted correctly by title
+// =====================================================
+
 describe('fetchMovies', () => {
-  // TEST: 1 - Mock the database call and test that it returns the expected data array
+  // TEST 3: 
   it('Returns the expected movie data array', async () => {
     const result = await fetchAllData();
     const movieData = await convertToArrayAndSortByTitle(result.movieData);
@@ -37,7 +46,7 @@ describe('fetchMovies', () => {
 
   });
 
-  // TEST: 2 - Movie data array is sorted correctly by title
+  // TEST 4:
   it('Sorts the movie data array by title', async () => {
     const result = await fetchAllData();
     const movieData = await convertToArrayAndSortByTitle(result.movieData);
@@ -51,10 +60,14 @@ describe('fetchMovies', () => {
  
 });
 
+// =====================================================
+// TEST 5: Input produces correct Output
+// =====================================================
+
 describe('getRecommendations', () => {
-  // TEST: 1 - Input produces correct Output
+  // TEST 5: 
   it('Returns an array of recommended movies', async () => {
-    const selectedArray = [1, 2, 3, 4, 5, 6, 7, 8]; // Test sample input of movie IDs
+    const selectedArray = [1, 2, 3, 4, 5, 6, 7, 8];
     const expectedOutput = [
       {"id": "9", "title": "Braveheart (1995)"}, 
       {"id": "12", "title": "Apollo 13 (1995)"}, 
@@ -66,7 +79,7 @@ describe('getRecommendations', () => {
       {"id": "24", "title": "Shawshank Redemption, The (1994)"}, 
       {"id": "26", "title": "Forrest Gump (1994)"}, 
       {"id": "27", "title": "Lion King, The (1994)"}
-    ]; // Expected output
+    ];
 
     const result = await getRecommendations(selectedArray);
 

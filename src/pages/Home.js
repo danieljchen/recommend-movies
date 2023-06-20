@@ -72,7 +72,8 @@ function Home(props) {
         const fetchAllMovies = async () => {
             // Fetch movies from JSON server
             const response = await fetchAllData();
-            const allMovies = await convertToArrayAndSortByTitle(response.movieData);
+            const { movieData } = response;
+            const allMovies = await convertToArrayAndSortByTitle(movieData);
             console.log("SUCCESSFULLY LOADED MOVIES: ", allMovies.length);
             setMovies(allMovies);
         }
