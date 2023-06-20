@@ -1,4 +1,4 @@
-# Movies Recommendation Coding Exercise Application 🕺
+# Movies Recommendation Application 🕺
 
 >This is a React App frontend using TailwindCSS.
 >React Testing Library/Jest for testing.
