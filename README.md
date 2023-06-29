@@ -4,10 +4,6 @@
 >React Testing Library/Jest for testing.
 >Data Source provided as movies.json, mocked api endpoints using json-server
 
-## Prerequisites
-1. JSON-SERVER - npm install -g json-server (https://www.npmjs.com/package/json-server).
-2. TailwindCSS - npm install -D tailwindcss / npx tailwindcss init [https://tailwindcss.com/docs/guides/create-react-app]
-
 ## React Client Application
 1. cd recommend-movies (project directory)
 2. npm i (MUST DO FIRST!)
@@ -17,7 +13,9 @@
 6. client application will start at <http://localhost:3000/>
 7. json-server endpoints can be tested at <http://localhost:3030/movies> OR <http://localhost:3030/users>
 
-
+## Installed Packages
+1. JSON-SERVER - npm install -g json-server (https://www.npmjs.com/package/json-server).
+2. TailwindCSS - npm install -D tailwindcss / npx tailwindcss init [https://tailwindcss.com/docs/guides/create-react-app]
 ## Deployment - OPTIONAL (NOT REQUIRED FOR THIS)
 1. npm run build
 
