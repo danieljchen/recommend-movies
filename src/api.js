@@ -1,21 +1,29 @@
 // =====================================================
 // UTIL API: Fetch all movies and users from JSON-SERVER
 // =====================================================
+async function fetchData(url) {
+  const requestOptions = {
+    method: "GET",
+    redirect: "follow",
+  };
+  const response = await fetch(url, requestOptions);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch data from ${url}`);
+  }
+
+  return response.json();
+}
+
 export async function fetchAllData() {
   try {
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
-    const moviesResponse = await fetch("http://localhost:3030/movies", requestOptions);
-    const usersResponse = await fetch("http://localhost:3030/users", requestOptions);
+    const moviesUrl = "http://localhost:3030/movies";
+    const usersUrl = "http://localhost:3030/users";
 
-    if (!moviesResponse.ok || !usersResponse.ok) {
-      throw new Error("Failed to fetch data from the server");
-    }
-
-    const movieData = await moviesResponse.json();
-    const userData = await usersResponse.json();
+    const [movieData, userData] = await Promise.all([
+      fetchData(moviesUrl),
+      fetchData(usersUrl),
+    ]);
 
     return { movieData, userData };
   } catch (error) {
@@ -23,6 +31,7 @@ export async function fetchAllData() {
     throw error;
   }
 }
+
 
 // =============================================================
 // UTIL FUNC: Convert movies object into array and sort by title
@@ -45,50 +54,48 @@ export async function convertToArrayAndSortByTitle(movies) {
 // STEP 4: Take the highest counts, cross reference against data source and return those as the recommendations (Top 10)
 // ======================================================
 export async function getRecommendations(selectedArray) {
-  const data = await fetchAllData();
-  const { movieData, userData } = data;
+  try {
+    const data = await fetchAllData();
+    const { movieData, userData } = data;
 
-  // STEP: 1
-  const matchArray = userData.map((user) => {
-    const matches = user.movies.filter((movie) => selectedArray.includes(movie)).length;
-    return {
-      user_id: user.user_id,
-      movies: user.movies,
-      matches: matches
-    };
-  });
-  matchArray.sort((a, b) => b.matches - a.matches);
+    const matchArray = userData.map((user) => {
+      const matches = user.movies.filter((movie) => selectedArray.includes(movie)).length;
+      return {
+        user_id: user.user_id,
+        movies: user.movies,
+        matches: matches,
+      };
+    });
+    matchArray.sort((a, b) => b.matches - a.matches);
 
-  // STEP: 2
-  const matchedAll = matchArray.filter((user) => user.matches === selectedArray.length);
-  const bestMatchesArray = matchedAll.length > 0 ? matchedAll : matchArray.slice(0, 10);
+    const matchedAll = matchArray.filter((user) => user.matches === selectedArray.length);
+    const bestMatchesArray = matchedAll.length > 0 ? matchedAll : matchArray.slice(0, 10);
 
-  // STEP: 3
-  const deltaArray = bestMatchesArray.flatMap((user) => {
-      return user.movies.filter(movie => !selectedArray.includes(movie));
-  });
-  
-  // Count the occurrences...
-  const movieIdCounts = {};
-  deltaArray.forEach((movieId) => {
+    const deltaArray = bestMatchesArray.flatMap((user) => {
+      return user.movies.filter((movie) => !selectedArray.includes(movie));
+    });
+
+    const movieIdCounts = {};
+    const uniqueMovieIds = new Set();
+    deltaArray.forEach((movieId) => {
       movieIdCounts[movieId] = (movieIdCounts[movieId] || 0) + 1;
-  });
-  
-  // Sort the movie IDs by most...
-  const sortedMovieIds = Object.keys(movieIdCounts).sort((a, b) => {
+      uniqueMovieIds.add(movieId);
+    });
+
+    const sortedMovieIds = Array.from(uniqueMovieIds).sort((a, b) => {
       return movieIdCounts[b] - movieIdCounts[a];
-  });
-  
-  // Take the top 10...
-  const topRecommendedMoviesArray = sortedMovieIds.slice(0, 10);
+    });
 
-  // STEP: 4
-  const finalRecommendationsArray = topRecommendedMoviesArray
-  .filter((movieId, index) => topRecommendedMoviesArray.indexOf(movieId) === index)
-  .map((movieId) => ({ id: movieId.toString(), title: movieData[movieId] }));
+    const topRecommendedMoviesArray = sortedMovieIds.slice(0, 10);
 
-  // TODO: Remove this console.log
-  // console.log("FINAL RECOMMENDATIONS ARRAY: ", finalRecommendationsArray);
+    const finalRecommendationsArray = topRecommendedMoviesArray.map((movieId) => ({
+      id: movieId.toString(),
+      title: movieData[movieId],
+    }));
 
-  return finalRecommendationsArray;
+    return finalRecommendationsArray;
+  } catch (error) {
+    console.error("An error occurred while generating recommendations :: getRecommendations :: ", error);
+    throw error;
+  }
 }
