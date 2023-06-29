@@ -35,27 +35,29 @@ describe('fetchMovies', () => {
   // TEST 3: 
   it('Returns the expected movie data array', async () => {
     const result = await fetchAllData();
-    const movieData = await convertToArrayAndSortByTitle(result.movieData);
+    const { movieData } = result;
+    const sortedMovies = await convertToArrayAndSortByTitle(movieData);
 
     // Assertion: 1 - Result exists
-    expect(movieData).toBeDefined();
+    expect(sortedMovies).toBeDefined();
     // Assertion: 2 - Result is an array
-    expect(Array.isArray(movieData)).toBe(true);
+    expect(Array.isArray(sortedMovies)).toBe(true);
     // Assertion: 3 - Result has at least one item
-    expect(movieData.length).toBeGreaterThan(0);
+    expect(sortedMovies.length).toBeGreaterThan(0);
 
   });
 
   // TEST 4:
   it('Sorts the movie data array by title', async () => {
     const result = await fetchAllData();
-    const movieData = await convertToArrayAndSortByTitle(result.movieData);
+    const { movieData } = result;
+    const sortedMovies = await convertToArrayAndSortByTitle(movieData);
 
     // Create a copy of the movieData array and sort it by title
-    const sortedMovieData = [...movieData].sort((a, b) => a.title.localeCompare(b.title));
+    const sortedMovieData = [...sortedMovies].sort((a, b) => a.title.localeCompare(b.title));
 
     // Assertion: The array is sorted correctly by title A-Z
-    expect(movieData).toEqual(sortedMovieData);
+    expect(sortedMovies).toEqual(sortedMovieData);
   });
  
 });
@@ -83,9 +85,9 @@ describe('getRecommendations', () => {
 
     const result = await getRecommendations(selectedArray);
 
+    // Assertion: The result array is in the right order
+    expect(result).toEqual(expectedOutput);
     // Assertion: The result array contains objects with the "title" property
-    expect(result).toEqual(
-      expect.arrayContaining(expectedOutput.map(item => expect.objectContaining(item)))
-    );
+    expect.arrayContaining(expectedOutput.map(item => expect.objectContaining(item)));
   });
 });
